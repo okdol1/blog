@@ -1,13 +1,18 @@
-import { useState } from "react";
-import ReactPlayer from "react-player";
-import VolumeOffIcon from "@/assets/icons/volume_off.svg?react";
-import VolumeUpIcon from "@/assets/icons/volume_up.svg?react";
-import ArrowBackIcon from "@/assets/icons/arrow_back.svg?react";
-import Header from "@/components/Header";
+"use client";
 
-const HomePage: React.FC = () => {
+import Image from "next/image";
+import { useEffect, useState } from "react";
+import Header from "../components/Header";
+import VolumeOffIcon from "@/assets/icons/volume_off.svg";
+import VolumeUpIcon from "@/assets/icons/volume_up.svg";
+import ArrowBackIcon from "@/assets/icons/arrow_back.svg";
+import dynamic from "next/dynamic";
+
+const ReactPlayer = dynamic(() => import("react-player"), { ssr: false });
+
+export default function Home() {
   const [isMuted, setIsMuted] = useState(true);
-  const [isPlayerOpen, setIsPlayerOpen] = useState(false);
+  const [isPlayerOpen, setIsPlayerOpen] = useState(true);
 
   const toggleMute = () => {
     setIsMuted((prev) => !prev);
@@ -17,14 +22,23 @@ const HomePage: React.FC = () => {
     setIsPlayerOpen((prev) => !prev);
   };
 
-  return (
-    <>
-      <Header />
+  useEffect(() => {
+    setTimeout(() => {
+      setIsMuted(true);
+    }, 1000);
+  }, []);
 
+  return (
+    <div>
       <main className="p-5 h-screen">
         <section className="h-full flex justify-center items-center">
-          <div className="group relative animate-float w-[10%]">
-            <img src="/images/astronaut.png" alt="astronaut" />
+          <div className="group relative animate-float">
+            <Image
+              src="/images/astronaut.png"
+              alt="astronaut"
+              width={120}
+              height={120}
+            />
             <span className="absolute top-0 left-0 hidden text-white group-hover:inline-block">
               Hello!
             </span>
@@ -66,8 +80,9 @@ const HomePage: React.FC = () => {
           </div>
         </div>
       </main>
-    </>
-  );
-};
 
-export default HomePage;
+      {/* // TODO: Header의 위치를 상단으로 이동하여 z-index 문제를 해결할 것 */}
+      <Header />
+    </div>
+  );
+}

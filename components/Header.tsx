@@ -1,10 +1,10 @@
 import { useState } from "react";
-import MenuIcon from "@/assets/icons/menu.svg?react";
-import CloseIcon from "@/assets/icons/close.svg?react";
-import { Link } from "react-router-dom";
+import MenuIcon from "@/assets/icons/menu.svg";
+import CloseIcon from "@/assets/icons/close.svg";
 import PAGES from "@/constants/page";
+import Link from "next/link";
 
-const Header: React.FC = () => {
+const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
@@ -13,7 +13,7 @@ const Header: React.FC = () => {
       <div>
         {!isMenuOpen && (
           <button
-            className="p-5 text-white z-10"
+            className="p-5 text-white"
             onClick={() => setIsMenuOpen(true)}
             aria-label="메뉴 열기"
           >
@@ -23,7 +23,7 @@ const Header: React.FC = () => {
 
         <div>
           <nav
-            className={`fixed top-0 right-0 w-1/3 h-full bg-black bg-opacity-80 transform transition-transform
+            className={`z-[100] fixed top-0 right-0 w-full h-full bg-black bg-opacity-80 transform transition-transform
             ${isMenuOpen ? "translate-x-0" : "translate-x-full"}
             `}
           >
@@ -37,22 +37,22 @@ const Header: React.FC = () => {
 
             <ul className="h-full flex flex-col justify-center items-center gap-y-4">
               <li>
-                <Link to={PAGES.PAGE_HOME} className="text-white p-5">
+                <Link href={PAGES.PAGE_HOME} className="text-white p-5">
                   Home
                 </Link>
               </li>
               <li>
-                <Link to={PAGES.PAGE_ABOUT_ME} className="text-white p-5">
+                <Link href={PAGES.PAGE_ABOUT_ME} className="text-white p-5">
                   About Me
                 </Link>
               </li>
               <li>
-                <Link to={PAGES.PAGE_BLOG} className="text-white p-5">
+                <Link href={PAGES.PAGE_BLOG} className="text-white p-5">
                   Blog
                 </Link>
               </li>
               <li>
-                <Link to={PAGES.PAGE_PROJECTS} className="text-white p-5">
+                <Link href={PAGES.PAGE_PROJECTS} className="text-white p-5">
                   Projects
                 </Link>
               </li>
