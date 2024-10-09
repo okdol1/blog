@@ -15,7 +15,7 @@ const Nav = () => {
     <>
       {!isMenuOpen && (
         <button
-          className="p-5 text-white"
+          className="p-5"
           onClick={() => setIsMenuOpen(true)}
           aria-label="메뉴 열기"
         >
@@ -29,7 +29,7 @@ const Nav = () => {
             `}
       >
         <button
-          className="fixed top-0 right-0 p-5 text-white"
+          className="fixed top-0 right-0 p-5"
           onClick={closeMenu}
           aria-label="메뉴 닫기"
         >
@@ -38,38 +38,22 @@ const Nav = () => {
 
         <ul className="h-full flex flex-col justify-center items-center gap-y-4">
           <li>
-            <Link
-              href={PAGES.HOME}
-              onClick={closeMenu}
-              className="text-white p-5"
-            >
+            <Link href={PAGES.HOME} onClick={closeMenu} className="p-5">
               Home
             </Link>
           </li>
           <li>
-            <Link
-              href={PAGES.ABOUT_ME}
-              onClick={closeMenu}
-              className="text-white p-5"
-            >
+            <Link href={PAGES.ABOUT_ME} onClick={closeMenu} className="p-5">
               About Me
             </Link>
           </li>
           <li>
-            <Link
-              href={PAGES.BLOG}
-              onClick={closeMenu}
-              className="text-white p-5"
-            >
+            <Link href={PAGES.BLOG} onClick={closeMenu} className="p-5">
               Blog
             </Link>
           </li>
           <li>
-            <Link
-              href={PAGES.PROJECTS}
-              onClick={closeMenu}
-              className="text-white p-5"
-            >
+            <Link href={PAGES.PROJECTS} onClick={closeMenu} className="p-5">
               Projects
             </Link>
           </li>

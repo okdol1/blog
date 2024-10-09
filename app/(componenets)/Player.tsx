@@ -28,14 +28,14 @@ const Player = () => {
       `}
       >
         <button
-          className="p-2 text-white"
+          className="p-2"
           onClick={togglePlayer}
           aria-label={isPlayerOpen ? "플레이어 숨기기" : "플레이어 펼치기"}
         >
           <ArrowBackIcon className={isPlayerOpen ? "" : "rotate-180"} />
         </button>
         <button
-          className="p-2 text-white"
+          className="p-2"
           onClick={toggleMute}
           aria-label={isMuted ? "음소거 해제" : "음소거"}
         >

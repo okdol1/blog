@@ -12,7 +12,7 @@ export default function Home() {
             width={120}
             height={120}
           />
-          <span className="absolute top-0 left-0 hidden text-white group-hover:inline-block">
+          <span className="absolute top-0 left-0 hidden group-hover:inline-block">
             Hello!
           </span>
         </div>
