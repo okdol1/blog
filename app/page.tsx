@@ -1,5 +1,4 @@
 import Image from "next/image";
-import Player from "./(componenets)/Player";
 
 export default function Home() {
   return (
@@ -17,8 +16,6 @@ export default function Home() {
           </span>
         </div>
       </section>
-
-      <Player />
     </main>
   );
 }

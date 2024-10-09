@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Header from "@/components/Header";
+import Player from "./(componenets)/Player";
 
 export const metadata: Metadata = {
   title: "Eunbin Galaxy",
@@ -14,11 +15,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="bg-[url('/images/bg.jpg')] w-screen h-screen bg-cover bg-no-repeat bg-center">
-        <div className="p-5 pt-20">{children}</div>
+      <body className="bg-[url('/images/bg.jpg')] w-screen h-screen bg-cover bg-no-repeat bg-center bg-fixed">
+        {children}
 
         {/* // TODO: Header의 위치를 상단으로 이동하여 z-index 문제를 해결할 것 */}
         <Header />
+        <Player />
       </body>
     </html>
   );
