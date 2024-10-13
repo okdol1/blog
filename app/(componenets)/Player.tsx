@@ -10,7 +10,7 @@ const ReactPlayer = dynamic(() => import("react-player"), { ssr: false });
 
 const Player = () => {
   const [isMuted, setIsMuted] = useState(true);
-  const [isPlayerOpen, setIsPlayerOpen] = useState(true);
+  const [isPlayerOpen, setIsPlayerOpen] = useState(false);
 
   const toggleMute = () => {
     setIsMuted((prev) => !prev);

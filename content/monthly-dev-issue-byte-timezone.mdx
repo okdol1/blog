@@ -1,0 +1,118 @@
+---
+title: "월간 개발 이슈 정리 - 글자수 byte 계산, 글로벌 타임존 처리"
+date: "2024-10-13"
+---
+
+기획: 텍스트 입력 시 즉시 바이트 수 표시
+결과물:
+
+<img src="/posts/월간_개발_이슈_정리_글자수_byte_계산_글로벌_타임존_처리/1.gif" />
+
+'월간 개발 이슈 정리' 컨텐츠를 떠올리게 된 버그입니다.
+
+사실 작년에도 유니코드와 관려된 기술 글을 쓴 적이 있습니다. 당시 글을 작성했던 과정은 이렇습니다:
+
+1. 위키에서 기술적인 내용을 찾아본다.
+2. 다른 블로그 글에서 요점을 빠르게 파악하고, 그 내용을 참고한다.
+3. 도입부만 다른 채, 2번에서 참고한 블로그 글의 내용과 거의 같다.
+
+이 과정에서 깊이 이해하지 못한 채 글만 썼기 때문인지, 1년이 지난 지금 어떻게 컴퓨터가 byte 수를 계산하는지 잊어버렸고, 위 영상처럼 byte 세는 기능을 `.length`로 처리하게 되었습니다. 이후 QA팀에서 생성한 버그 티켓을 보고나서야 문제를 알아차렸고, 버그를 수정할 수 있었습니다.
+
+이후 글또 글을 작성해야하기도 하고, 유니코드와 UTF-8에 대해 복습할 겸 내용을 정리하다가 문득 작년의 저와 크게 다르지 않다는 걸 깨달았습니다. 그러면서 더 나은 방법이 떠올랐습니다.
+
+이미 잘 정리된 기술 글들이 많으니, 똑같이 복사한 듯한 글을 쓰기보다는, 제가 겪었던 버그나 기능 구현 과정을 참고했던 기술 글들의 링크도 함께 제공하면서 스토리텔링 형식으로 풀어보는 것이 좋겠다는 생각이 들었습니다.
+
+> **목차**
+>
+> - bug: 글자 수 byte UTF-8 기준 계산
+> - bug: 글로벌 타임존 처리
+> - feat: 변경 값이 있을 경우, 페이지 이탈 방지 기능 구현
+> - fix: 다국적 서비스를 위한 날짜 처리
+
+# bug: 글자 수 byte UTF-8 기준 계산
+
+다시 상단의 영상을 확인해보면, 입력된 텍스트의 `.length`로 글자 수를 계산하고 있습니다. 그러나 기획 의도는 "글자 수"가 아닌 "바이트 수"를 기준으로 해야 합니다. 예를 들어, 한글처럼 UTF-8에서 여러 바이트를 차지하는 글자는 `.length`로는 한 글자로 처리되지만, 실제로는 더 많은 공간을 차지합니다.
+
+## 문자열을 바이트로 변환하는 방법
+
+우리가 목표로 하는 것은 UTF-8 기준 바이트 수를 계산하는 것입니다. 이를 위해서는 텍스트를 실제 바이트로 변환해 주는 작업이 필요해요. 아래처럼 `TextEncoder`를 사용하면 문자열을 UTF-8 바이트 배열로 변환할 수 있습니다.
+
+```
+function getByteLength(text) {
+	return new TextEncoder().encode(text).length;
+}
+```
+
+적용 결과:
+
+<img src="/posts/월간_개발_이슈_정리_글자수_byte_계산_글로벌_타임존_처리/2.gif" />
+
+## 참조
+
+- UTF-8 바이트 수 계산에 대한 더 자세한 설명: [글자수를 세는 방법](https://medium.com/@vagabond95/%EA%B8%80%EC%9E%90%EC%88%98%EB%A5%BC-%EC%84%B8%EB%8A%94-%EB%B0%A9%EB%B2%95-4e35b37ad90f)
+
+# bug: 글로벌 타임존 처리
+
+다국적 서비스를 개발하다 보면 다양한 국가와 타임존을 다루는 것이 쉬운 일이 아니라는 것을 느낍니다...
+이 버그 또한 타임존 처리와 관련된 문제입니다. 유저의 타임존에 맞춰 시간을 노출해야하기 때문에 Day.js 라이브러리를 이용해 타임존을 다루고 있었는데, 일부 국가에서 타임존 정보가 `undefined`로 나오는 상황이 발생했습니다.
+
+기존의 타임존 오프셋에 맞춰 시간대를 출력하는 함수는 아래와 같습니다:
+
+```
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
+// 24시간대 설정
+const timeZones = {
+"+14:00": "LINT", // Line Islands Time
+"+13:00": "PHOT", // Phoenix Islands Time
+"+12:00": "FJT", // Fiji Time
+"+11:00": "NCT", // New Caledonia Time
+"+10:00": "AEST", // Australian Eastern Standard Time
+"+09:00": "KST", // Korea Standard Time
+...
+"-11:00": "SST", // Samoa Standard Time
+};
+
+export function getTimeWithRegionFormat(date: dayjs.Dayjs, format?: string) {
+	const offset = date.format("Z"); // 타임존 오프셋을 가져옴
+	const abbr = timeZones[offset as keyof typeof timeZones];
+	const formattedTime = date.format(format ?? "YYYY.MM.DD HH:mm");
+	return `${formattedTime} (${abbr})`;
+}
+```
+
+문제가 발생한 부분은 일부 국가의 타임존 오프셋이 위 코드의 `timeZones` 객체에 없어서 `undefined`가 반환되게 되었습니다.
+
+정상적으로 타임존이 노출될 경우:
+
+<img src="/posts/월간_개발_이슈_정리_글자수_byte_계산_글로벌_타임존_처리/3.png" />
+
+일부 국가에서 타임존이 undefined로 노출되는 경우:
+
+<img src="/posts/월간_개발_이슈_정리_글자수_byte_계산_글로벌_타임존_처리/4.png" />
+
+그래서 이 문제를 해결하기 위해 **등록되지 않은 타임존은 기본적으로 UTC로 처리**하도록 로직을 수정했습니다.
+
+## 기본 UTC 타임존 처리 추가
+
+```
+export function getTimeWithRegionFormat(date: dayjs.Dayjs, format?: string) {
+  const offset = date.format("Z"); // 타임존 오프셋을 가져옴
+  const abbr = timeZones[offset as keyof typeof timeZones] || "UTC"; // 등록되지 않은 타임존은 UTC로 처리
+  const formattedTime = (abbr === "UTC" ? date.utc() : date).format(
+    format ?? "YYYY.MM.DD HH:mm"
+  );
+  return `${formattedTime} (${abbr})`;
+}
+```
+
+적용 결과:
+[재현 스텝]
+
+1. 시스템 시간 설정에서 임의 국가로 변경
+2. 해당 국가 타임존을 노출되는지 기간 확인
+   <img src="/posts/월간_개발_이슈_정리_글자수_byte_계산_글로벌_타임존_처리/5.png" />
