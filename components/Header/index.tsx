@@ -14,15 +14,18 @@ const Header = () => {
 
   return (
     <>
-      <header className="fixed top-0 left-0 w-full flex justify-between bg-black">
-        <Link href={PAGES.HOME} className="font-bold p-5 text-white">
-          Eunbin Galaxy ✦
-        </Link>
-        <Nav
-          isOpen={isMenuOpen}
-          handleOpen={openMenu}
-          handleClose={closeMenu}
-        />
+      <header className="fixed top-0 left-0 w-full bg-black">
+        <div className="w-full flex justify-between">
+          <Link href={PAGES.HOME} className="font-bold p-5 text-white">
+            Eunbin Galaxy ✦
+          </Link>
+          <Nav
+            isOpen={isMenuOpen}
+            handleOpen={openMenu}
+            handleClose={closeMenu}
+          />
+        </div>
+        <div className="mx-5 border-b border-gray-800" />
       </header>
 
       <Player isMenuOpen={isMenuOpen} />

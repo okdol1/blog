@@ -1,10 +1,13 @@
-import { useState } from "react";
+import { memo, useCallback, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
 import VolumeOffIcon from "@/assets/icons/volume_off.svg";
 import VolumeUpIcon from "@/assets/icons/volume_up.svg";
 import ArrowBackIcon from "@/assets/icons/arrow_back.svg";
 import PAGES from "@/constants/page";
 import { usePathname } from "next/navigation";
+
+const MemoizedVolumeOffIcon = memo(VolumeOffIcon);
+const MemoizedVolumeUpIcon = memo(VolumeUpIcon);
 
 const ReactPlayer = dynamic(() => import("react-player"), { ssr: false });
 
@@ -15,8 +18,11 @@ interface PlayerProps {
 const Player: React.FC<PlayerProps> = ({ isMenuOpen }) => {
   const pathname = usePathname();
 
-  const isHomePage = pathname === PAGES.HOME;
-  const isVisiblePlayer = isHomePage || isMenuOpen;
+  const isHomePage = useMemo(() => pathname === PAGES.HOME, [pathname]);
+  const isVisiblePlayer = useMemo(
+    () => isHomePage || isMenuOpen,
+    [isHomePage, isMenuOpen]
+  );
 
   const [isMuted, setIsMuted] = useState(true);
   const [isPlayerOpen, setIsPlayerOpen] = useState(false);
@@ -30,16 +36,19 @@ const Player: React.FC<PlayerProps> = ({ isMenuOpen }) => {
     setIsPlayerOpen((prev) => !prev);
   };
 
-  const handleError = (e: Error) => {
-    console.log({ e });
+  const handleError = useCallback((e: Error) => {
     setError(true);
     console.error("Video Error: ", e);
-  };
+  }, []);
 
-  if (!isVisiblePlayer || error) return null;
+  if (error) return null;
 
   return (
-    <div className="fixed bottom-5 left-0">
+    <div
+      className={`fixed bottom-5 left-0
+${isVisiblePlayer ? "" : "opacity-0"}
+`}
+    >
       <div
         className={`flex justify-between px-2
 ${isPlayerOpen ? "" : "flex-col"}
@@ -57,7 +66,7 @@ ${isPlayerOpen ? "" : "flex-col"}
           onClick={toggleMute}
           aria-label={isMuted ? "음소거 해제" : "음소거"}
         >
-          {isMuted ? <VolumeOffIcon /> : <VolumeUpIcon />}
+          {isMuted ? <MemoizedVolumeOffIcon /> : <MemoizedVolumeUpIcon />}
         </button>
       </div>
 
