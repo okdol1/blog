@@ -3,7 +3,8 @@ import path from "path";
 import matter from "gray-matter";
 
 import PageTitle from "@/components/Typography/PageTitle";
-import BlogListItem from "@/components/Blog/BlogListItem";
+import PostCard from "@/components/Blog/PostCard";
+import FeaturedRecentPosts from "@/components/Blog/FeaturedRecentPosts";
 
 const getPosts = () => {
   const postsDirectory = path.join(process.cwd(), "content");
@@ -30,30 +31,18 @@ export default function BlogPage() {
   const posts = getPosts();
 
   return (
-    <div>
+    <>
       <PageTitle title="The Blog" />
 
-      <div className="grid grid-cols-2 gap-4">
-        <div className="col-span-1">
-          <div className="h-full">
-            <BlogListItem post={posts[0]} />
-          </div>
-        </div>
+      <section className="space-y-10">
+        <FeaturedRecentPosts posts={posts} />
 
-        <div className="col-span-1 grid grid-rows-3 gap-4">
-          {posts.slice(1, 4).map((post) => (
-            <div key={post.slug}>
-              <BlogListItem post={post} />
-            </div>
+        <div className="grid grid-cols-4 gap-10">
+          {posts.slice(4).map((post) => (
+            <PostCard key={post.slug} post={post} />
           ))}
         </div>
-      </div>
-
-      <div className="grid grid-cols-4 gap-4">
-        {posts.slice(4).map((post) => (
-          <BlogListItem key={post.slug} post={post} />
-        ))}
-      </div>
-    </div>
+      </section>
+    </>
   );
 }

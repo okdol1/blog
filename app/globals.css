@@ -6,6 +6,23 @@ body {
   @apply text-white;
 }
 
+/* PostCard  */
+.post-card h2 {
+  @apply font-semibold;
+}
+
+.post-card p {
+  @apply text-gray-300;
+}
+
+.post-card time {
+  @apply text-gray-500;
+}
+
+.post-card img {
+  @apply rounded-md;
+}
+
 /* 제목 스타일 */
 .content h1 {
   font-size: 2.5rem;

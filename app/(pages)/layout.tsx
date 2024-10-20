@@ -3,7 +3,7 @@ interface PagesLayoutProps {
 }
 
 const PagesLayout = ({ children }: PagesLayoutProps) => {
-  return <div className="mt-16 px-5 pb-10">{children}</div>;
+  return <main className="mt-16 px-5 pb-10">{children}</main>;
 };
 
 export default PagesLayout;

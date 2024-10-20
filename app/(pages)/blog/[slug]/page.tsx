@@ -20,10 +20,15 @@ export default async function PostPage({
   const { data, content } = getPost(params.slug);
 
   return (
-    <div className="content">
-      <h1 className="font-bold border-b pb-3 mb-10">{data.title}</h1>
-      <p>{data.date}</p>
-      <MDXRemote source={content} />
-    </div>
+    <article>
+      <header>
+        <h1 className="font-bold border-b pb-3 mb-10">{data.title}</h1>
+        <p>{data.date}</p>
+      </header>
+
+      <div className="content">
+        <MDXRemote source={content} />
+      </div>
+    </article>
   );
 }
