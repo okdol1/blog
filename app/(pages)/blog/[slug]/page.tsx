@@ -21,13 +21,16 @@ export default async function PostPage({
 
   return (
     <article>
-      <header>
-        <h1 className="font-bold border-b pb-3 mb-10">{data.title}</h1>
-        <p>{data.date}</p>
+      <header className="text-center pt-16 pb-20">
+        <time className="text-xs">{data.date}</time>
+        <h1 className="text-5xl font-semibold">{data.title}</h1>
+        <p>{data.subTitle}</p>
       </header>
 
-      <div className="content">
-        <MDXRemote source={content} />
+      <div className="w-full grid place-content-center">
+        <div className="content max-w-[1080px] space-y-10">
+          <MDXRemote source={content} />
+        </div>
       </div>
     </article>
   );
