@@ -14,11 +14,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="bg-[url('/images/bg.jpg')] bg-cover bg-no-repeat bg-center bg-fixed">
-        {children}
-
-        {/* // TODO: Header의 위치를 상단으로 이동하여 z-index 문제를 해결할 것 */}
-        <Header />
+      <body>
+        <div className="bg-[url('/images/bg.jpg')] bg-cover bg-no-repeat bg-center bg-fixed min-h-screen grid grid-rows-[auto,1fr]">
+          <Header />
+          {children}
+        </div>
       </body>
     </html>
   );

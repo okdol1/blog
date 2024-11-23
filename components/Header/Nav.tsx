@@ -19,7 +19,7 @@ const Nav: React.FC<NavProps> = ({ isOpen, handleOpen, handleClose }) => {
       )}
 
       <nav
-        className={`z-50 fixed top-0 right-0 w-full h-full bg-black bg-opacity-80 transform transition-transform
+        className={`fixed top-0 right-0 w-full h-full bg-black bg-opacity-80 transform transition-transform
 ${isOpen ? "translate-x-0" : "translate-x-full"}
 `}
       >

@@ -22,8 +22,8 @@ const Header = () => {
   );
 
   return (
-    <>
-      <header className="fixed top-0 left-0 w-full bg-black">
+    <header className="z-40">
+      <div className="sticky top-0 left-0 w-full bg-black">
         <div className="w-full flex justify-between">
           <Link href={PAGES.HOME} className="font-bold p-5 text-white">
             Eunbin Galaxy ✦
@@ -35,10 +35,10 @@ const Header = () => {
           />
         </div>
         {!isHomePage && <div className="mx-5 border-b border-gray-800" />}
-      </header>
+      </div>
 
       <Player isVisible={isVisiblePlayer} />
-    </>
+    </header>
   );
 };
 

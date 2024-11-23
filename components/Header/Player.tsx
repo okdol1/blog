@@ -31,14 +31,10 @@ const Player: React.FC<PlayerProps> = ({ isVisible }) => {
     console.error("Video Error: ", e);
   }, []);
 
-  if (error) return null;
+  if (error || !isVisible) return null;
 
   return (
-    <div
-      className={`fixed bottom-5 left-0
-${isVisible ? "" : "opacity-0"}
-`}
-    >
+    <div className="fixed bottom-5 left-0">
       <div
         className={`flex justify-between px-2
 ${isPlayerOpen ? "" : "flex-col"}
