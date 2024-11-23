@@ -8,7 +8,7 @@ thumbnail: ""
 기획: 텍스트 입력 시 즉시 바이트 수 표시
 결과물:
 
-<img src="/posts/월간_개발_이슈_정리_글자수_byte_계산_글로벌_타임존_처리/1.gif" />
+![글자수 byte 계산 변경 전](/posts/monthly-dev-issue-byte-timezone/1.gif)
 
 '월간 개발 이슈 정리' 컨텐츠를 떠올리게 된 버그입니다.
 
@@ -47,7 +47,7 @@ function getByteLength(text) {
 
 적용 결과:
 
-<img src="/posts/월간_개발_이슈_정리_글자수_byte_계산_글로벌_타임존_처리/2.gif" />
+![글자수 byte 계산 변경 후](/posts/monthly-dev-issue-byte-timezone/2.gif)
 
 ## 참조
 
@@ -91,11 +91,11 @@ export function getTimeWithRegionFormat(date: dayjs.Dayjs, format?: string) {
 
 정상적으로 타임존이 노출될 경우:
 
-<img src="/posts/월간_개발_이슈_정리_글자수_byte_계산_글로벌_타임존_처리/3.png" />
+![글로벌 타임존 정상 화면](/posts/monthly-dev-issue-byte-timezone/3.png)
 
 일부 국가에서 타임존이 undefined로 노출되는 경우:
 
-<img src="/posts/월간_개발_이슈_정리_글자수_byte_계산_글로벌_타임존_처리/4.png" />
+![글로벌 타임존 undefined 노출 화면](/posts/monthly-dev-issue-byte-timezone/4.png)
 
 그래서 이 문제를 해결하기 위해 **등록되지 않은 타임존은 기본적으로 UTC로 처리**하도록 로직을 수정했습니다.
 
@@ -117,4 +117,4 @@ export function getTimeWithRegionFormat(date: dayjs.Dayjs, format?: string) {
 
 1. 시스템 시간 설정에서 임의 국가로 변경
 2. 해당 국가 타임존을 노출되는지 기간 확인
-   <img src="/posts/월간_개발_이슈_정리_글자수_byte_계산_글로벌_타임존_처리/5.png" />
+   ![글로벌 타임존 개선](/posts/monthly-dev-issue-byte-timezone/5.png)

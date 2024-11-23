@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
 import { MDXRemote } from "next-mdx-remote/rsc";
+import { markdownComponents } from "@/components/mdx";
 
 const getPost = (slug: string) => {
   const postsDirectory = path.join(process.cwd(), "content");
@@ -29,7 +30,7 @@ export default async function PostPage({
 
       <div className="w-full grid place-content-center">
         <div className="content max-w-[1080px] space-y-10">
-          <MDXRemote source={content} />
+          <MDXRemote source={content} components={markdownComponents} />
         </div>
       </div>
     </article>

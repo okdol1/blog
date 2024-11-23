@@ -9,6 +9,7 @@ interface FeaturedRecentPostsProps {
 
 const FeaturedRecentPosts: React.FC<FeaturedRecentPostsProps> = ({ posts }) => {
   const latestPost = posts[0];
+  
 
   return (
     <div className="grid grid-cols-2 gap-10">
