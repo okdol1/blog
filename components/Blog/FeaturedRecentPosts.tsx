@@ -9,7 +9,6 @@ interface FeaturedRecentPostsProps {
 
 const FeaturedRecentPosts: React.FC<FeaturedRecentPostsProps> = ({ posts }) => {
   const latestPost = posts[0];
-  
 
   return (
     <div className="grid grid-cols-2 gap-10">
@@ -33,7 +32,7 @@ const FeaturedRecentPosts: React.FC<FeaturedRecentPostsProps> = ({ posts }) => {
           <article key={slug} className="post-card">
             <Link
               href={`${PAGES.BLOG}/${slug}`}
-              className="w-full grid grid-cols-[1fr,2fr] gap-x-5"
+              className="w-full flex gap-x-5"
             >
               <Image
                 src={thumbnail}
