@@ -18,8 +18,7 @@ const config: Config = {
         float: "float 4s ease-in-out infinite",
       },
       colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
+        "primay-text": "#F5F5F5",
       },
     },
   },

@@ -5,28 +5,36 @@ import Link from "next/link";
 
 interface PostCardProps {
   post: Post;
-  className?: string;
 }
 
 const PostCard: React.FC<PostCardProps> = ({
   post: { slug, thumbnail, date, title, subTitle },
-  className = "",
 }) => {
   return (
-    <article className={`post-card ${className}`}>
-      <Link href={`${PAGES.BLOG}/${slug}`} className="w-full">
+    <Link
+      href={`${PAGES.BLOG}/${slug}`}
+      className="group w-full block rounded-[10px] overflow-hidden bg-white bg-opacity-10"
+    >
+      <div className="relative w-full h-[200px] overflow-hidden">
         <Image
           src={thumbnail}
           alt="Post thumbnail"
-          layout="responsive"
-          width={100}
-          height={50}
+          layout="fill"
+          className="object-cover object-left-top transform transition-transform duration-300 ease-in-out group-hover:scale-105"
         />
-        <time className="text-xs">{date}</time>
-        <h2 className="text-lg pb-1">{title}</h2>
-        <p className="text-sm">{subTitle}</p>
-      </Link>
-    </article>
+      </div>
+
+      <div className="h-[180px] flex flex-col justify-between p-3  gap-y-2 text-xs">
+        <div className="space-y-2">
+          <h2 className="text-sm whitespace-pre-wrap break-words font-semibold">
+            {title}
+          </h2>
+          <p className="line-clamp-3">{subTitle}</p>
+        </div>
+
+        <time className="">{date}</time>
+      </div>
+    </Link>
   );
 };
 

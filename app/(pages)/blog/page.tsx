@@ -4,7 +4,7 @@ import matter from "gray-matter";
 
 import PageTitle from "@/components/Typography/PageTitle";
 import PostCard from "@/components/Blog/PostCard";
-import FeaturedRecentPosts from "@/components/Blog/FeaturedRecentPosts";
+import { extractFirstImage, extractText } from "@/utils/markdownUtils";
 
 const getPosts = () => {
   const postsDirectory = path.join(process.cwd(), "content");
@@ -13,14 +13,14 @@ const getPosts = () => {
   const posts = filenames.map((filename) => {
     const filePath = path.join(postsDirectory, filename);
     const fileContents = fs.readFileSync(filePath, "utf8");
-    const { data } = matter(fileContents);
+    const { data, content } = matter(fileContents);
 
     return {
       title: data.title,
-      subTitle: data.subTitle || "",
+      subTitle: data.subTitle || extractText(content).slice(0, 200),
       date: data.date,
       slug: filename.replace(".mdx", ""),
-      thumbnail: data.thumbnail,
+      thumbnail: data.thumbnail || extractFirstImage(content),
     };
   });
 
@@ -34,14 +34,10 @@ export default function BlogPage() {
     <>
       <PageTitle title="The Blog" />
 
-      <section className="space-y-10">
-        <FeaturedRecentPosts posts={posts} />
-
-        <div className="grid grid-cols-4 gap-10">
-          {posts.slice(4).map((post) => (
-            <PostCard key={post.slug} post={post} />
-          ))}
-        </div>
+      <section className="grid grid-cols-3 gap-4">
+        {posts.map((post) => (
+          <PostCard key={post.slug} post={post} />
+        ))}
       </section>
     </>
   );

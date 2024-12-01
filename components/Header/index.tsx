@@ -34,7 +34,6 @@ const Header = () => {
             handleClose={closeMenu}
           />
         </div>
-        {!isHomePage && <div className="mx-5 border-b border-gray-800" />}
       </div>
 
       <Player isVisible={isVisiblePlayer} />

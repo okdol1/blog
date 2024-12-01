@@ -22,10 +22,9 @@ export default async function PostPage({
 
   return (
     <article>
-      <header className="text-center pt-16 pb-20">
+      <header className="pt-16 pb-20">
+        <h1 className="text-[40px] font-bold">{data.title}</h1>
         <time className="text-xs">{data.date}</time>
-        <h1 className="text-5xl font-semibold">{data.title}</h1>
-        <p>{data.subTitle}</p>
       </header>
 
       <div className="w-full grid place-content-center">

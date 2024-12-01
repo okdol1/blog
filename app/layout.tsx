@@ -15,7 +15,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <div className="bg-[url('/images/bg.jpg')] bg-cover bg-no-repeat bg-center bg-fixed min-h-screen grid grid-rows-[auto,1fr]">
+        <div className="bg-[url('/images/bg.jpg')] bg-cover bg-no-repeat bg-center bg-fixed min-h-screen grid grid-rows-[auto,1fr] text-primay-text">
           <Header />
           {children}
         </div>
