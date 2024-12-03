@@ -1,5 +1,9 @@
 const CustomParagraph = (props: React.HTMLAttributes<HTMLHeadingElement>) => {
-  return <p {...props} />;
+  return (
+    <div className="my-[1px]">
+      <p className="py-[3px]" {...props} />
+    </div>
+  );
 };
 
 export default CustomParagraph;

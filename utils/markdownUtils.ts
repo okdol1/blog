@@ -18,3 +18,10 @@ export const extractFirstImage = (content: string) => {
   const match = content.match(imageRegex);
   return match ? match[1] : null; // 이미지 src 반환 또는 null
 };
+
+export const generateId = (text: React.ReactNode): string => {
+  if (typeof text === "string") {
+    return text.trim().toLowerCase().replace(/\s+/g, "-");
+  }
+  return "";
+};

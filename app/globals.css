@@ -1,3 +1,23 @@
+@import "prismjs/themes/prism-tomorrow.css";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.custom-scrollbar {
+  @apply overflow-y-auto;
+}
+.custom-scrollbar-x {
+  @apply overflow-x-auto;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  @apply w-2;
+}
+.custom-scrollbar-x::-webkit-scrollbar {
+  @apply h-2;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb,
+.custom-scrollbar-x::-webkit-scrollbar-thumb {
+  @apply bg-white bg-opacity-20 rounded-full;
+}

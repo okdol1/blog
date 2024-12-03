@@ -1,5 +1,5 @@
 import CustomBlockquote from "./CustomBlockquote";
-import CustomCodeBlock from "./CustomCodeBlock";
+import CustomCodeBlock from "./codeBlock/CustomCodeBlock";
 import CustomHr from "./CustomHr";
 import CustomImage from "./CustomImage";
 import CustomLink from "./CustomLink";
@@ -23,7 +23,7 @@ export const markdownComponents = {
   a: CustomLink,
   img: CustomImage,
   blockquote: CustomBlockquote,
-  code: CustomCodeBlock,
   pre: CustomPre,
+  code: CustomCodeBlock,
   hr: CustomHr,
 };

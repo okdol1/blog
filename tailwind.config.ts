@@ -20,6 +20,9 @@ const config: Config = {
       colors: {
         "primay-text": "#F5F5F5",
       },
+      maxWidth: {
+        content: "800px",
+      },
     },
   },
   plugins: [],
