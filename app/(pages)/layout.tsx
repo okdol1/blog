@@ -4,8 +4,8 @@ interface PagesLayoutProps {
 
 const PagesLayout = ({ children }: PagesLayoutProps) => {
   return (
-    <main className="grid justify-center">
-      <div className="max-w-content mx-5">{children}</div>
+    <main className="flex flex-col items-center">
+      <div className="max-w-content px-5 w-full ">{children}</div>
     </main>
   );
 };

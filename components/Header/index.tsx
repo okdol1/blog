@@ -22,18 +22,16 @@ const Header = () => {
   );
 
   return (
-    <header className="z-40">
-      <div className="sticky top-0 left-0 w-full bg-black">
-        <div className="w-full flex justify-between">
-          <Link href={PAGES.HOME} className="font-bold p-5 text-white">
-            Eunbin Galaxy ✦
-          </Link>
-          <Nav
-            isOpen={isMenuOpen}
-            handleOpen={openMenu}
-            handleClose={closeMenu}
-          />
-        </div>
+    <header className="z-40 sticky top-0 left-0 w-full bg-black">
+      <div className="w-full flex justify-between">
+        <Link href={PAGES.HOME} className="font-bold p-5 text-white">
+          Eunbin Galaxy ✦
+        </Link>
+        <Nav
+          isOpen={isMenuOpen}
+          handleOpen={openMenu}
+          handleClose={closeMenu}
+        />
       </div>
 
       <Player isVisible={isVisiblePlayer} />

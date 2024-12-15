@@ -21,7 +21,7 @@ const config: Config = {
         "primay-text": "#F5F5F5",
       },
       maxWidth: {
-        content: "800px",
+        content: "960px",
       },
     },
   },

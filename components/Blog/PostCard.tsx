@@ -13,9 +13,9 @@ const PostCard: React.FC<PostCardProps> = ({
   return (
     <Link
       href={`${PAGES.BLOG}/${slug}`}
-      className="group w-full block rounded-[10px] overflow-hidden bg-white bg-opacity-10"
+      className="group w-full rounded-[10px] overflow-hidden bg-white bg-opacity-10 grid grid-cols-[120px,1fr] gap-x-4 sm:block"
     >
-      <div className="relative w-full h-[200px] overflow-hidden">
+      <div className="relative h-[120px] rounded-[10px] sm:h-[200px] sm:rounded-none overflow-hidden">
         <Image
           src={thumbnail}
           alt="Post thumbnail"
@@ -24,15 +24,15 @@ const PostCard: React.FC<PostCardProps> = ({
         />
       </div>
 
-      <div className="h-[180px] flex flex-col justify-between p-3  gap-y-2 text-xs">
+      <div className="sm:h-[180px] flex flex-col justify-between sm:p-3 gap-y-2 text-xs">
         <div className="space-y-2">
           <h2 className="text-sm whitespace-pre-wrap break-words font-semibold">
             {title}
           </h2>
-          <p className="line-clamp-3">{subTitle}</p>
+          <p className="line-clamp-2 sm:line-clamp-3">{subTitle}</p>
         </div>
 
-        <time className="">{date}</time>
+        <time>{date}</time>
       </div>
     </Link>
   );
