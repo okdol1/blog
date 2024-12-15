@@ -19,13 +19,15 @@ const CustomCodeBlock = (props: React.HTMLAttributes<HTMLElement>) => {
   }
 
   return (
-    <div className="max-w-content my-1 rounded bg-[#121212] text-[85%]">
+    <div className="my-1">
       <pre
-        className="custom-scrollbar-x "
+        className="custom-scrollbar-x rounded"
         style={{
-          backgroundColor: "transparent",
+          WebkitOverflowScrolling: "touch",
+          backgroundColor: "#121212",
           margin: 0,
           padding: "32px 16px 32px 32px",
+          fontSize: "85%",
         }}
       >
         <code {...props} />

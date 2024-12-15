@@ -7,7 +7,7 @@ interface PostBodyProps {
 
 const PostBody: React.FC<PostBodyProps> = ({ content }) => {
   return (
-    <div className="relative bg-black text-[16px] leading-normal flex flex-col items-start">
+    <div className="relative bg-black text-[16px] leading-normal w-full overflow-hidden">
       <MDXRemote source={content} components={markdownComponents} />
     </div>
   );

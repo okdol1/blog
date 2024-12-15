@@ -20,7 +20,7 @@ export default async function PostPage({
   const { data, content } = getPost(params.slug);
 
   return (
-    <article className="mt-16 mb-20 sm:mb-60">
+    <article className="grid mt-16 mb-20 sm:mb-60">
       <header className="pb-2.5">
         <h1 className="text-[40px] font-bold mb-6">{data.title}</h1>
 
