@@ -4,7 +4,7 @@ const CustomHeading1 = (props: React.HTMLAttributes<HTMLHeadingElement>) => {
   const id = generateId(props.children);
 
   return (
-    <div className="mt-[2em] mb-1">
+    <div className="pt-[2em] pb-1">
       <a href={`#${id}`}>
         <h2
           id={id}

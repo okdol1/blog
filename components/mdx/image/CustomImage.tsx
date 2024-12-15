@@ -6,7 +6,7 @@ const CustomImage = ({
   HTMLImageElement
 >) => {
   return (
-    <div className="relative my-1 w-full h-full max-w-content">
+    <div className="relative py-1 w-full h-full max-w-content">
       <img src={src} alt={alt} />
     </div>
   );

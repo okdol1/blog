@@ -19,7 +19,7 @@ const CustomCodeBlock = (props: React.HTMLAttributes<HTMLElement>) => {
   }
 
   return (
-    <div className="my-1">
+    <div className="py-1">
       <pre
         className="custom-scrollbar-x rounded"
         style={{
