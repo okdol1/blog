@@ -8,7 +8,9 @@ import { extractFirstImage, extractText } from "@/utils/markdownUtils";
 
 const getPosts = () => {
   const postsDirectory = path.join(process.cwd(), "content");
-  const filenames = fs.readdirSync(postsDirectory);
+  const filenames = fs
+    .readdirSync(postsDirectory)
+    .filter((filename) => filename !== "sample.mdx");
 
   const posts = filenames.map((filename) => {
     const filePath = path.join(postsDirectory, filename);
