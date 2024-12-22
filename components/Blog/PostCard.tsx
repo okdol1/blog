@@ -16,12 +16,17 @@ const PostCard: React.FC<PostCardProps> = ({
       className="group w-full rounded-[10px] overflow-hidden bg-white bg-opacity-10 grid grid-cols-[120px,1fr] gap-x-4 sm:block"
     >
       <div className="relative h-[120px] rounded-[10px] sm:h-[200px] sm:rounded-none overflow-hidden">
-        <Image
-          src={thumbnail}
-          alt="Post thumbnail"
-          layout="fill"
-          className="object-cover object-left-top transform transition-transform duration-300 ease-in-out group-hover:scale-105"
-        />
+        {thumbnail ? (
+          <Image
+            src={thumbnail}
+            alt="Post thumbnail"
+            layout="fill"
+            className="object-cover object-left-top transform transition-transform duration-300 ease-in-out group-hover:scale-105"
+          />
+        ) : (
+          // TODO: Replace with a placeholder image
+          <div className="bg-slate-600 w-full h-full" />
+        )}
       </div>
 
       <div className="sm:h-[180px] flex flex-col justify-between sm:p-3 gap-y-2 text-xs">

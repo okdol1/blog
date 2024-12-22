@@ -1,0 +1,465 @@
+---
+title: "React 성능 최적화"
+subTitle: ""
+date: "2023-04-13"
+thumbnail: ""
+---
+
+최근 사수분의 서비스 성능 최적화 PR 코드를 보면서 아 저렇게 성능 최적화할 수 있구나 라는 생각이 많이 들었다.
+
+그만큼 성능 최적화 방법들에 대해 많이 알고 있지 못했는데 나중에 성능 최적화할 상황을 대비해서 React 성능 최적화 방법에 대해 정리해보고자 한다.
+
+먼저 React 컴포넌트의 리렌더링 조건에 대해 알아보자!
+
+> 본인의 state가 변경될 때부모 컴포넌트로부터 받아오는 props가 변경될 때부모 컴포넌트가 리렌더링 될 떄shouldComponentUpdate(), forceUpdate() 등 강제 업데이트 메서드
+
+리렌더링을 하면 컴포넌트를 reflow & repaint 를 함에 따른 브라우저 성능 저하가 발생할 뿐만 아니라, 다른 이슈도 동반된다.
+
+함수형 컴포넌트의 경우, 리렌더링을 할 경우 내부 로직들이 재호출되기 때문에 그만큼 불필요한 컴포넌트들의 호출을 최소화해야 한다.
+
+그렇기에, React에서 렌더링을 최적화하는 좀 더 효율적인 설계와 기능들에 대해 한 번 정리해보자
+
+# 1. 코드 분할(Code Spliting)
+
+### 코드 분할이 필요한 이유
+
+lighthouse에서 권장하는 성능 개선 방법 중 하나가 사용하지 않는 자바스크립트 줄이기이다. 서버 측에서 렌더링하지 않는 경우 `React.lazy()`로 자바스크립트 번들을 분할하는 방법을 사용할 수 있다.
+
+대부분의 React 앱들은 Webpack, Rollup 또는 Browserify 같은 툴을 사용하여 여러 파일을 하나로 병합한 번들 파일을 웹 페이지에 포함해 한 번에 전체 앱을 로드한다. 하지만, 앱이 커지면 번들 파일도 커지게 된다. 특히 큰 규모의 서드 파티 라이브러리를 추가할 때 실수로 앱이 커저서 로드 시간이 길어지는 것을 방지하기 위해 주의해야 한다.
+
+번들이 거대해지는 것을 방지하기 위한 좋은 해결방법은 번들을 나누는 것이다.
+
+> 코드 분할은 앱을 "지연 로딩"하게 도와주고 앱의 획기적인 성능 향상을 돕는다. 앱의 코드 양을 줄이지 않고도 사용자가 필요하지 않은 코드를 불러오지 않게 하며 앱의 초기화 로딩에 필요한 비용을 줄여준다.
+
+## React.lazy()
+
+React.lazy 함수를 사용하면 동적 import를 사용해 컴포넌트 렌더링이 가능하다.
+
+```jsx
+// Before
+import OtherComponent from "./OtherComponent";
+
+// After
+const OtherComponent = React.lazy(() => import("./OtherComponent"));
+```
+
+- MyComponent가 처음 렌더링될 때 OtherComponent를 포함한 번들을 자동으로 불러온다.
+- React.lazy는 동적 import()를 호출하는 함수를 인자로 가진다.
+- 이 함수는 **React 컴포넌트를 default export로 가진 모듈 객체가 이행되는 Promise를 반환**한다.
+
+**lazy 컴포넌트는 반드시 Suspense 컴포넌트 하위에서 렌더링되어야 하며** Suspense는 lazy 컴포넌트가 로드되길 기다리는 동안 로딩 화면과 같은 예비 컨텐츠를 보여줄 수 있게 해준다.
+
+```jsx
+import React, { Suspense } from "react";
+
+const OtherComponent = React.lazy(() => import("./OtherComponent"));
+
+function MyComponent() {
+  return (
+    <div>
+      <Suspense fallback={<div>Loading...</div>}>
+        <OtherComponent />
+      </Suspense>
+    </div>
+  );
+}
+```
+
+fallback prop은 컴포넌트가 로드될 때까지 기다리는 동안 렌더링하려는 React Element를 받아들인다. Suspense 컴포넌트는 lazy 컴포넌트를 감싸며, 하나의 Suspense 컴포넌트로 여러 lazy 컴포넌트를 감쌀 수도 있다.
+
+```jsx
+import React, { Suspense } from "react";
+
+const OtherComponent = React.lazy(() => import("./OtherComponent"));
+const AnotherComponent = React.lazy(() => import("./AnotherComponent"));
+
+function MyComponent() {
+  return (
+    <div>
+      <Suspense fallback={<div>Loading...</div>}>
+        <section>
+          <OtherComponent />
+          <AnotherComponent />
+        </section>
+      </Suspense>
+    </div>
+  );
+}
+```
+
+## Error boundaries
+
+네트워크 장애 같은 이유로 다른 모듈을 로드에 실패할 경우 에러를 발생시킬 수 있다. 이때 **Error Boundaries**를 이용하여 사용자의 경험과 복구 관리를 처리할 수 있다. Error Boundary를 만들고 lazy 컴포넌트를 감싸면 네트워크 장애가 발생했을 때 에러를 표시할 수 있다.
+
+```jsx
+import React, { Suspense } from "react";
+import MyErrorBoundary from "./MyErrorBoundary";
+
+const OtherComponent = React.lazy(() => import("./OtherComponent"));
+const AnotherComponent = React.lazy(() => import("./AnotherComponent"));
+
+const MyComponent = () => (
+  <div>
+    <MyErrorBoundary>
+      <Suspense fallback={<div>Loading...</div>}>
+        <section>
+          <OtherComponent />
+          <AnotherComponent />
+        </section>
+      </Suspense>
+    </MyErrorBoundary>
+  </div>
+);
+```
+
+# **2. 적절한 위치에 state 선언**
+
+```jsx
+const DataPage = () => {
+  const [list, setList] = useState(LIST);
+  return (
+    <div>
+      <h1>페이지 컴포넌트</h1>
+      <DataList listProps={list} />
+    </div>
+  );
+};
+
+const DataList = ({ listProps }) => {
+  const [list, setList] = useState(LIST);
+  return (
+    <div>
+      <h2>리스트 컴포넌트</h2>
+      // 1) 최상위 컴포넌트의 props로 맵핑
+      {listProps.map((e) => (
+        <DataItem data={e} />
+      ))}
+      // 2) 본인 컴포넌트의 state로 맵핑
+      {list.map((e) => (
+        <DataItem data={e} />
+      ))}
+    </div>
+  );
+};
+
+const DataItem = ({ data }) => {
+  return (
+    <div>
+      <h3>아이템 컴포넌트</h3>
+      <h4>{data.title}</h4>
+      <img src={data.img} />
+      <p>{data.description}</p>
+    </div>
+  );
+};
+```
+
+> 페이지, 리스트, 아이템 컴포넌트가 부모 - 자식관계를 이루고 있는 예시
+
+LIST라는 static data를 가져와 state로 관리하고 이를 리스트 컴포넌트에서 렌더링하려고 할 때, 방법은 2가지가 있을 것이다.
+
+1. 페이지 컴포넌트에서 props로 리스트 컴포넌트에 전달
+2. 리스트 컴포넌트가 state로 저장해서 사용
+
+어떤 방법을 사용할지는 여건에 따라 달라질 수 있다. 만약, **페이지 컴포넌트에서 리스트 데이터를 참조한다면 여기서 state로 저장**하는 게 나을 것이다.
+
+하지만, 그런 경우가 아니라면 오히려 이 리스트 데이터가 갱신됬을 때, 페이지 컴포넌트 내 **리스트 외 다른 컴포넌트들까지 리렌더링을 유발**할 수 있다.
+
+그렇기 때문에, **리스트 컴포넌트가 직접 state에 저장하고 이를 아이템 컴포넌트로 맵핑하는 2번 방법**이 최적화 측면에서 유리할 것이다.
+
+# 3. 객체 타입의 state 변형하지 않기
+
+```jsx
+// 생성자 함수
+<Component prop={new Obj('x')} />
+
+// 객체 리터럴
+<Component prop={{ key: 'x' }} />
+```
+
+이처럼, 새로운 객체를 생성해서 props로 자식 컴포넌트에 전달하면 문제가 발생할 수 있다.
+
+부모 컴포넌트가 다른 요인으로 리렌더링되면, 해당 props 객체는 값은 같지만 참조주소가 다른 새로운 객체로 인식되기 때문에 이 역시 자식 컴포넌트의 리렌더링을 유발한다.
+
+그렇기에 **데이터의 변형을 상위에서 하는 것보단, state 그대로 컴포넌트로 전달에서 하위에서 이를 가공하는 것**이 유리하다.
+
+[안좋은 예시 코드(codesandbox)](https://codesandbox.io/s/react-seongneungcoejeoghwa-badyesi-1-4vrrx3)
+
+- result라는 가공된 객체를 별도의 props로 전달하기 때문에, `<UserList>` 컴포넌트가 다른 요인으로 리렌더링 될 때마다 이 result 객체가 얽인 `<Item>` 컴포넌트들도 같이 리렌더링되는 비효율성이 생긴다.
+
+[좋은 예시 코드(codesandbox)](https://codesandbox.io/s/react-seongneungcoejeoghwa-goodyesi-1-5w4kt7?file=/src/Item.jsx)
+
+- 이처럼, `<UserList>` 컴포넌트는 각 user 데이터 그대로만 props로 내려주고, 데이터 가공을 `<Item>` 에서 진행한다.
+
+# **4. 컴포넌트 맵핑 시 key 값의 중요성**
+
+![1.png](/posts/react-performance-optimization/1.png)
+
+React에서는 **컴포넌트들을 맵핑할 때, 고유의 key 값을 부여할 것을 강제**하고 있다. 이 때, key값에 index를 사용하는것을 지양해야 한다.
+
+리스트 데이터에 아이템이 추가/삭제 되었을 때를 생각하면 그 이유를 알 수 있다.
+
+아이템이 중간에서 추가/삭제되면, 그 **이후의 아이템 컴포넌트들의 index가 바뀌므로 key값이 바뀜에 따라 리렌더링이 발생**하게 된다.
+
+또한, 이러한 반복적인 데이터 조작으로 index가 순간적으로 꼬이면서 오류를 유발할 수 있다.
+
+가급적이면 데이터의 id 등 고유값을 key에 넣기를 권장하나, 아래와 같은 경우엔 index를 써도 무방하다.
+
+- 배열과 각 요소가 수정, 삭제, 추가 등의 기능이 없는 단순 렌더링만 담당하는 경우
+- id로 쓸만한 unique 값이 없을 경우
+- 정렬 혹은 필터 요소가 없어야 함
+
+# 5. React.memo()
+
+> React.memo() 는 컴포넌트를 랩핑하여 메모이제이션 하고, props가 바뀌지 않으면 리렌더링을 방지하는 함수이다.
+
+```jsx
+const FunctionalComponent = React.memo(({...props}) => {
+  return (
+    //html tag
+  )
+}, (prevProps, nextProps) => {
+  if('리 렌더링 해야하는 조건') {
+    return false;
+  }
+  return true;
+})
+```
+
+기본적인 문법은 위와 같다. 컴포넌트를 `React.memo()` 로 감싸며, 첫 번째 인자는 컴포넌트, 두 번째 인자는 콜백함수(리렌더 조건)을 받는다.
+
+다음은 사용 예시이다. `<UserList>` 의 리스트 state가 수정되어도, 이미 렌더링된 `<UserItem>` 은 리렌더되지 않도록 `React.memo()`로 방지한 모습이다.
+
+```jsx
+// UserList.jsx
+
+import { useState } from "react";
+
+import UserItem from "components/section/examples/example5/UserItem";
+import Button from "components/atom/Button";
+
+function UserList() {
+  console.log("UserList component render");
+
+  const [users, setUsers] = useState([
+    {
+      id: 0,
+      name: "Kim",
+      age: 27,
+      score: 80,
+    },
+    {
+      id: 1,
+      name: "Jo",
+      age: 25,
+      score: 70,
+    },
+  ]);
+
+  const addUser = () => {
+    setUsers([
+      ...users,
+      {
+        id: 2,
+        name: "Jung",
+        age: 30,
+        score: 90,
+      },
+    ]);
+  };
+
+  return (
+    <div>
+      <Button
+        value="새 유저 생성"
+        disabled={users.length >= 3}
+        onClick={addUser}
+      />
+      {users.map((user) => {
+        return <UserItem key={user.id} user={user} />;
+      })}
+    </div>
+  );
+}
+
+export default UserList;
+```
+
+```jsx
+// UserItem.jsx
+
+import React from "react";
+
+function UserItem({ user }) {
+  console.log(`UserItem (id: ${user.id}) component render`);
+
+  return (
+    <div className="user-item">
+      <div>이름: {user.name}</div>
+      <div>나이: {user.age}</div>
+      <div>점수: {user.score}</div>
+    </div>
+  );
+}
+
+export default React.memo(UserItem);
+```
+
+React.memo() 는 Hooks가 아닌 일종의 HOC(고차 컴포넌트)이다.
+
+그렇기에 클래스형 & 함수형 컴포넌트 모두 적용 가능하며, 함수형 컴포넌트에서 shouldComponentUpdate() 메서드의 대안으로 제시되는 솔루션이다.
+
+# 6. useMemo()
+
+컴포넌트 내 어떤 함수가 값을 리턴하는데 많은 시간이 소요된다면, 이 컴포넌트가 리렌더링 될 때마다 함수호출에 많은 시간이 소요될 것이다.
+
+또, 그 함수의 리턴값을 자식 컴포넌트가 참조한다면, 해당값이 변경될 때마다 리렌더링이 발생될 것이다.
+
+> useMemo() 는 이런 경우 사용되는 Hooks로, CPU 소모가 심한 함수들을 캐싱하기 위해 사용된다.
+
+```jsx
+// UserList.jsx
+
+import { useState } from "react";
+
+import Average from "components/section/examples/example8/Average";
+import UserItem from "components/section/examples/example8/UserItem";
+import Button from "components/atom/Button";
+
+function UserList() {
+  console.log("UserList component render");
+
+  const [text, setText] = useState("");
+  const [users, setUsers] = useState([
+    {
+      id: 0,
+      name: "Kim",
+      age: 27,
+      score: 80,
+    },
+    {
+      id: 1,
+      name: "Jo",
+      age: 25,
+      score: 70,
+    },
+  ]);
+
+  const average = (function () {
+    console.log("calculate average. It takes long time !!");
+
+    return users.reduce((result, user) => {
+      return result + user.score / users.length;
+    }, 0);
+  })();
+
+  const addUser = () => {
+    setUsers([
+      {
+        id: 2,
+        name: "Jung",
+        age: 30,
+        score: 90,
+      },
+      ...users,
+    ]);
+  };
+
+  return (
+    <div>
+      <div>
+        <input
+          type="text"
+          value={text}
+          placeholder="아무 내용이나 입력하세요."
+          onChange={(event) => setText(event.target.value)}
+        />
+      </div>
+      <Button
+        value="새 유저 생성"
+        disabled={users.length >= 3}
+        onClick={addUser}
+      />
+      <Average average={average} />
+      {users.map((user) => {
+        return <UserItem key={user.id} user={user} />;
+      })}
+    </div>
+  );
+}
+
+export default UserList;
+```
+
+위 예제의 `average` 함수를 보자. users 유저들의 점수 데이터의 **평균을 반환하는 일종의 computed state(계산된 상태값)**이다.
+
+이는 유저수가 많아질수록 연산에 많은 리소스가 소요되기에, 컴포넌트가 **리렌더링 될 때마다 호출된다는 비효율성이 발생**한다.
+
+```jsx
+useMemo(() => func, [input_dependency]);
+```
+
+이를 최적화하기 위해 `useMemo()` Hooks를 사용한다.
+
+**첫 번째 인자는 캐싱하는 함수이며, 두 번째 인자는 [dependency array]** 로 여기에 포함된 값이 바뀌어야 해당 함수를 재호출한다.
+
+통상, dependency 에는 캐싱함수와 연관된 props, state 등을 넣어준다.
+
+```jsx
+const average = useMemo(() => {
+  console.log("calculate average. It takes long time !!");
+  return users.reduce((result, user) => {
+    return result + user.score / users.length;
+  }, 0);
+}, [users]);
+```
+
+```jsx
+const Root = () => {
+  const [isClicked, setIsClicked] = useState(false);
+  const _onClick = useCallback(() => {
+      setIsClicked(true); },
+  []);
+  // dependency가 없으므로 Root component가 렌더링 되는 최초에 한번만 생성되며 이후에는 동일한 참조 값을 사용한다.
+
+  return (
+      <>
+          <Child onClick={_onClick}/>
+          <Child onClick={_onClick}/>
+          ...
+          <Child onClick={_onClick}/>
+      </>
+  );
+};
+// Root와 Child가 여러번 렌더링 되더라도 onClick props으로 전달되는 _onClick 함수는 한번만 생성되므로 계속해서 동일 참조 값을 가진다.
+
+const Child = ({onClick}) => {
+  return <button onClick={onClick}>Click Me!</button>
+```
+
+위 예시를 보면, `<Child>` 컴포넌트의 **클릭 이벤트 핸들러 함수인 `_onClick`을 `useCallback()` 으로 메모이제이션** 한 모습이다.
+
+본래는, `_onClick()` 메서드로 인해 `isClicked`가 토글링되면 `<Root>`가 리렌더링 되고, 이에 따라 `_onClick()` 메서드 역시 재호출되어야 하지만,
+
+**`useCallback()` Hooks로 메모이징했고 dependency가 없기 때문에 최초 렌더링 이외에는 재호출이 일어나지 않는다.**
+
+# 8. useState의 함수형 없데이트
+
+```jsx
+// 예시) 삭제 함수
+const onRemove = useCallback(
+  (id) => {
+    setTodos(todos.filter((todo) => todo.id !== id));
+  },
+  [todos]
+);
+
+// 예시) 함수형 업데이트 후
+const onRemove = useCallback((id) => {
+  setTodos((todos) => todos.filter((todo) => todo.id !== id));
+}, []);
+```
+
+위는 todos 리스트를 삭제하는 `onRemove()` 메서드의 예시이다. 본래, `useCallback`으로 선언했고, todos가 dependency로 들어가있다.
+
+하지만, `setState()` 함수에 새로운 값이 아닌, 상태 업데이트를 정의하는 함수를 넣어주면 dependency가 필요없게 되므로 onRemove() 함수의 불필요한 재호출을 최소화할 수 있다.

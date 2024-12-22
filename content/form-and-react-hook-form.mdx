@@ -1,0 +1,194 @@
+---
+title: "Form과 Reack Hook Form(RHF)"
+subTitle: ""
+date: "2023-06-15"
+thumbnail: "/posts/form-and-react-hook-form/thumbnail.png"
+---
+
+> Html의 element 중에서 `form`에 대해 알아보려고 한다.
+> `form`은 실서비스를 구현 할 때 많이 사용하는 요소 중 하나인데 관련해서 자세히 공부하려던 중 화해 블로그의 Reack Hook Form관련 글을 읽고 도움이 될 것 같아 Reack Hook Form의 정의도 함께 정리해봤다.
+
+# Form 태그란?
+
+Form 태그는 웹 페이지에서 사용자가 정보를 입력하고 제출할 수 있도록 하는 HTML 요소다. 예를 들어, 사용자가 웹사이트에 로그인하거나, 데이터를 검색하거나, 정보를 업데이트하는 등의 액션을 수행할 때 Form 태그가 사용된다.
+
+### **Form 태그 방식 vs Input과 Button 방식**
+
+| **구분**         | **Form 태그 방식**                                                | **Input과 Button 방식**                                                                        |
+| ---------------- | ----------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| 자동 유효성 검사 | HTML5 form과 input 필드의 속성을 사용하여 자동 유효성 검사를 지원 | JavaScript를 이용한 수동 유효성 검사 필요                                                      |
+| 페이지 새로고침  | 사용자가 form을 제출하면 페이지 새로고침 발생                     | AJAX와 같은 기술을 사용하여 페이지 새로고침 없이 서버와 데이터를 교환                          |
+| 요청 방식        | form 태그의 method 속성을 사용하여 GET, POST 메소드 지원          | JavaScript를 사용하여 요청 방식(GET, POST, PUT, DELETE 등), 헤더, 요청 본문 등을 유연하게 조정 |
+| 데이터 인코딩    | form 태그의 enctype 속성을 사용하여 데이터를 인코딩               | JavaScript를 사용하여 데이터를 인코딩하고, 요청 본문에 포함                                    |
+| 비동기 처리      | 지원하지 않음. form 제출은 동기적으로 처리                        | JavaScript의 Promise나 async/await 문법을 사용하여 비동기 통신 지원                            |
+
+### HTML에서 Form 태그 사용하기
+
+기본적인 Form 태그의 구조
+
+```html
+<form onSubmit="{handleSubmit}">
+  <input type="text" name="username" required />
+  <input type="password" name="password" required />
+  <button type="submit">Submit</button>
+</form>
+```
+
+[Form 태그의 요소들](https://www.w3schools.com/html/html_form_elements.asp)
+
+[Form 태그의 속성](https://www.w3schools.com/html/html_forms_attributes.asp)
+
+### Form 태그의 한계
+
+그러나 Form 태그만을 사용하면 몇 가지 한계를 가진다. 이에는 사용자 입력 유효성 검사, 복잡한 폼 상태 관리, 반응형 폼 핸들링 등을 직접 구현해야 하는 번거로움이 포함된다.
+
+# React Hook Form란?
+
+React Hook Form은 이러한 문제를 해결하기 위해 탄생한 라이브러리다. React Hook Form은 React에서 폼을 더 쉽게 관리할 수 있도록 도와준다.
+
+### React Hook Form의 장점
+
+React Hook Form은 비제어 컴포넌트(React에 의해 값이 제어되지 않는 컴포넌트)의 장점은 그대로 살리면서 제어 컴포넌트에서만 다룰 수 있는 실시간 유효성 검사, 실시간 동기화 등의 API를 제공하여 실시간 유효성 검사 및 동기화를 가능하게 해준다. 한마디로 제어 컴포넌트를 사용할 때 보다 훨씬 적은 코드와 리렌더링을 최소화하여 성능을 향상시키는 라이브러리다.
+
+- 리렌더링을 최소화시켜 마운팅 속도를 높여준다.
+- 라이브러리를 선택할 땐 패키지 크기도 중요하다. 공식 홈페이지에 super light라고 표기된 걸 확인할 수 있을 정도로 종속성이 없는 작은 사이즈의 라이브러리이다.
+- 타입스크립트 기본 제공
+- 친절한 공식문서
+- 지속적인 업데이트
+
+### 사용방법
+
+```markdown
+$npm install react-hook-form
+```
+
+```jsx
+import React from "react";
+import { useForm } from "react-hook-form";
+
+export default function App() {
+  // 필드 등록
+  const { register, handleSubmit } = useForm();
+
+  const onSubmit = (data) => console.log(data);
+  const onErrors = (errors) => console.error(errors);
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit, onErrors)}>
+      {/* 이름이 "username"인 input 필드를 React Hook Form에 등록 */}
+      <input {...register("username")} required />
+      <input {...register("password")} required />
+      <button type="submit">Submit</button>
+    </form>
+  );
+}
+```
+
+- `register` : 해당 비제어 컴포넌트의 값을 트래킹하고 Hook과 연결하여 유효성 검사를 하기 위해 사용된다.
+- `handleSubmit` : form 제출 핸들링 메서드이다. 유효성 검사에 통과하면 호출하는 콜백과 fail일 때 에러와 함께 호출되는 콜백이 있다.
+
+# React Hook Form의 isDirty
+
+**`isDirty`**는 React Hook Form의 상태 메소드 중 하나다. 이 메소드는 사용자가 입력 필드의 값이 원래의 값과 다른 경우 **`true`**를 반환한다. 즉, 입력 필드가 '더럽혀졌다'(변경되었다)는 것을 나타낸다.
+
+### isDirty의 개념과 용도
+
+Form 상태에서 **`isDirty`**를 사용하면 사용자가 폼 내용을 변경했는지 여부를 쉽게 알 수 있다. 이는 사용자에게 변경사항을 저장하거나 취소하라는 메시지를 보여주는 등의 상황에서 유용하다.
+
+### 예제
+
+```jsx
+import { useForm } from "react-hook-form";
+
+function App() {
+  const {
+    register,
+    formState: { isDirty },
+  } = useForm();
+
+  return (
+    <form>
+      <input {...register("username")} />
+      {isDirty && <p>You have unsaved changes!</p>}
+    </form>
+  );
+}
+```
+
+# React Hook Form의 dirtyFields
+
+**`dirtyFields`**는 React Hook Form의 또 다른 상태 메소드다. 이 메소드는 사용자가 변경한 모든 필드의 이름을 Set 객체로 반환한다.
+
+### dirtyFields의 개념과 용도
+
+**`dirtyFields`**를 사용하면 어떤 필드가 변경되었는지 정확하게 파악할 수 있다. 이 정보는 특정 필드에 대한 유효성 검사를 수행하거나, 변경된 필드만 서버에 업데이트하는 등의 상황에서 유용하다.
+
+### 예제
+
+```jsx
+import { useForm } from "react-hook-form";
+
+function App() {
+  const {
+    register,
+    formState: { dirtyFields },
+  } = useForm();
+
+  return (
+    <form>
+      <input {...register("username")} />
+      <input {...register("email")} />
+      {dirtyFields.has("username") && <p>You changed your username</p>}
+      {dirtyFields.has("email") && <p>You changed your email</p>}
+    </form>
+  );
+}
+```
+
+# Form 태그 vs React Hook Form
+
+HTML Form 태그는 웹 페이지에서 사용자 입력을 수집하는 데 사용되는 기본적인 도구다. 그러나 Form 태그만으로는 복잡한 유효성 검사나 상태 관리를 수행하기 어렵다. 반면, React Hook Form은 이러한 작업을 간편하게 해주는 라이브러리다.
+
+HTML Form 태그는 간단한 Form을 만드는데 적합하며, JavaScript를 많이 사용하지 않아도 된다. 하지만 복잡한 Form을 만들거나, 리액트를 사용하는 경우에는 React Hook Form이 더 효과적이다.
+
+# React Hook Form 활용하기
+
+회원 가입 Form에서는 다양한 필드의 유효성을 검사하고, 필드 값이 변경될 때마다 특정 로직을 수행 예시
+
+```jsx
+import { useForm } from "react-hook-form";
+
+function App() {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isDirty, dirtyFields },
+  } = useForm();
+
+  const onSubmit = (data) => {
+    if (isDirty) {
+      // Process the dirtyFields as required
+    }
+    console.log(data);
+  };
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <input {...register("username", { required: true })} />
+      {errors.username && <p>Username is required</p>}
+      <input {...register("password", { required: true, minLength: 6 })} />
+      {errors.password && (
+        <p>Password is required and should be at least 6 characters</p>
+      )}
+      <button type="submit">Submit</button>
+    </form>
+  );
+}
+```
+
+# 참고
+
+1. [**MDN Web Docs - Form 태그**](https://developer.mozilla.org/ko/docs/Web/HTML/Element/form)
+2. [**React Hook Form 공식 문서**](https://react-hook-form.com/)
+3. [**React Hook Form - FormState**](https://react-hook-form.com/api/useform/formstate)
+4. [**React Hook Form의 isDirty와 dirtyFields를 알아보자 - 화해 블로그**](https://blog.hwahae.co.kr/all/tech/9249)

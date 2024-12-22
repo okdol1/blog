@@ -3,5 +3,5 @@ export interface Post {
   subTitle: string;
   date: string;
   slug: string;
-  thumbnail: string;
+  thumbnail: string | null;
 }
