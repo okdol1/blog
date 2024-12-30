@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import Header from "@/components/Header";
+import { GoogleTagManager } from "@next/third-parties/google";
 
 export const metadata: Metadata = {
   title: "Eunbin Galaxy",
@@ -24,6 +25,7 @@ export default function RootLayout({
           {children}
         </div>
       </body>
+      <GoogleTagManager gtmId="GTM-TWNT4BD4" />
     </html>
   );
 }
