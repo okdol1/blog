@@ -5,8 +5,21 @@ interface ImageRowProps {
 }
 
 const ImageRow: React.FC<ImageRowProps> = ({ children }) => {
+  const getGridCols = () => {
+    if (!Array.isArray(children)) return "grid-cols-1";
+
+    switch (children.length) {
+      case 1:
+        return "grid-cols-1";
+      case 2:
+        return "grid-cols-2";
+      default:
+        return "grid-cols-3";
+    }
+  };
+
   return (
-    <div className="grid grid-cols-3 gap-3 py-1">
+    <div className={`grid grid-cols-3 gap-3 py-1 ${getGridCols()}`}>
       {Array.isArray(children) &&
         children.map((child, index) => (
           <div key={index} className="aspect-[3/4]">
