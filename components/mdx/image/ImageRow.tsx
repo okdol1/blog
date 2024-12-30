@@ -19,7 +19,7 @@ const ImageRow: React.FC<ImageRowProps> = ({ children }) => {
   };
 
   return (
-    <div className={`grid grid-cols-3 gap-3 py-1 ${getGridCols()}`}>
+    <div className={`grid gap-3 py-1 ${getGridCols()}`}>
       {Array.isArray(children) &&
         children.map((child, index) => (
           <div key={index} className="aspect-[3/4]">
