@@ -12,6 +12,9 @@ import CustomListItem from "./Lists/CustomListItem";
 import CustomOrderedList from "./Lists/CustomOrderedList";
 import CustomUnorderedList from "./Lists/CustomUnorderedList";
 import ImageRow from "./image/ImageRow";
+import Table from "./Table";
+import TableRow from "./Table/TableRow";
+import TableCell from "./Table/TableCell";
 
 export const markdownComponents = {
   h1: CustomHeading1,
@@ -28,4 +31,7 @@ export const markdownComponents = {
   code: CustomCodeBlock,
   hr: CustomHr,
   ImageRow,
+  Table,
+  TableRow,
+  TableCell,
 };
