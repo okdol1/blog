@@ -1,5 +1,6 @@
 export const extractText = (content: string) => {
   return content
+    .replace(/<br\s*\/?>/gi, "") // <br /> 제거
     .replace(/!\[.*?\]\(.*?\)/g, "") // 이미지 제거 ![alt](src)
     .replace(/\[.*?\]\(.*?\)/g, "") // 링크 제거 [text](url)
     .replace(/`.*?`/g, "") // 인라인 코드 제거 `code`
