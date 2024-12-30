@@ -91,11 +91,11 @@ export function getTimeWithRegionFormat(date: dayjs.Dayjs, format?: string) {
 
 정상적으로 타임존이 노출될 경우:
 
-![글로벌 타임존 정상 화면](/posts/monthly-dev-issue-byte-timezone/3.png)
+![](/posts/monthly-dev-issue-byte-timezone/3.png)
 
 일부 국가에서 타임존이 undefined로 노출되는 경우:
 
-![글로벌 타임존 undefined 노출 화면](/posts/monthly-dev-issue-byte-timezone/4.png)
+![](/posts/monthly-dev-issue-byte-timezone/4.png)
 
 그래서 이 문제를 해결하기 위해 **등록되지 않은 타임존은 기본적으로 UTC로 처리**하도록 로직을 수정했습니다.
 
@@ -117,4 +117,4 @@ export function getTimeWithRegionFormat(date: dayjs.Dayjs, format?: string) {
 
 1. 시스템 시간 설정에서 임의 국가로 변경
 2. 해당 국가 타임존을 노출되는지 기간 확인
-   ![글로벌 타임존 개선](/posts/monthly-dev-issue-byte-timezone/5.png)
+   ![](/posts/monthly-dev-issue-byte-timezone/5.png)
