@@ -26,7 +26,7 @@ const Player: React.FC<PlayerProps> = ({ isVisible }) => {
   };
 
   return (
-    <div className={`fixed bottom-5 ${isVisible ? "left-0" : "left-[-50%]"}`}>
+    <div className={`fixed bottom-5 ${isVisible ? "left-0" : "left-[-100%]"}`}>
       <div
         className={`flex justify-between px-2
 ${isPlayerOpen ? "" : "flex-col"}

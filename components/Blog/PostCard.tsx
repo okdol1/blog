@@ -29,7 +29,7 @@ const PostCard: React.FC<PostCardProps> = ({
         )}
       </div>
 
-      <div className="sm:h-[180px] flex flex-col justify-between sm:p-3 gap-y-2 text-xs">
+      <div className="sm:h-[180px] py-2 flex flex-col justify-between sm:p-3 gap-y-2 text-xs">
         <div className="space-y-2">
           <h2 className="text-sm whitespace-pre-wrap break-words font-semibold">
             {title}
