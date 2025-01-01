@@ -2,11 +2,9 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import Header from "@/components/Header";
 import { GoogleTagManager } from "@next/third-parties/google";
+import { METADATA } from "@/constants/metadata";
 
-export const metadata: Metadata = {
-  title: "Eunbin Galaxy",
-  description: "Explore the cosmos of frontend development.",
-};
+export const metadata: Metadata = METADATA;
 
 export const viewport: Viewport = {
   themeColor: "black",

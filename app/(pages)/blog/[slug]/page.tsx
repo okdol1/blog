@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
 import PostBody from "@/components/Blog/PostBody";
+import { METADATA_IMAGE } from "@/constants/metadata";
 
 const getPost = (slug: string) => {
   const postsDirectory = path.join(process.cwd(), "content");
@@ -11,6 +12,33 @@ const getPost = (slug: string) => {
 
   return { data, content };
 };
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { slug: string };
+}) {
+  const { slug } = params;
+  const { data } = getPost(slug);
+
+  return {
+    title: data.title,
+    openGraph: {
+      title: data.title,
+      url: `https://www.eunbinyeon.com/blog/${slug}`,
+      images: [
+        {
+          url: data.thumbnail,
+        },
+        METADATA_IMAGE,
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: data.title,
+    },
+  };
+}
 
 export default async function PostPage({
   params,
