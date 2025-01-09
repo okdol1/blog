@@ -16,9 +16,9 @@ const getPost = (slug: string) => {
 export async function generateMetadata({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }) {
-  const { slug } = params;
+  const slug = (await params).slug;
   const { data } = getPost(slug);
 
   return {
@@ -43,9 +43,10 @@ export async function generateMetadata({
 export default async function PostPage({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }) {
-  const { data, content } = getPost(params.slug);
+  const slug = (await params).slug;
+  const { data, content } = getPost(slug);
 
   return (
     <article className="grid mt-16 mb-20 sm:mb-60">
