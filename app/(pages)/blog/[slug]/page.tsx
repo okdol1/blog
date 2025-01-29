@@ -24,9 +24,9 @@ export async function generateStaticParams() {
 export async function generateMetadata({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }) {
-  const { slug } = await params;
+  const slug = (await params).slug;
   const { data } = getPost(slug);
 
   return {
@@ -51,9 +51,11 @@ export async function generateMetadata({
 export default async function PostPage({
   params,
 }: {
-  params: { slug: string };
+  // Next.js 15에서는 params가 자동으로 Promise로 감싸짐
+  // params를 그대로 사용하면 빌드 시 타입 에러 발생
+  params: Promise<{ slug: string }>;
 }) {
-  const { slug } = await params;
+  const slug = (await params).slug;
   const { data, content } = getPost(slug);
 
   return (
