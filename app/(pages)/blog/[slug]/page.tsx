@@ -4,21 +4,29 @@ import matter from "gray-matter";
 import PostBody from "@/components/Blog/PostBody";
 import { METADATA_IMAGE } from "@/constants/metadata";
 
+const postsDirectory = path.join(process.cwd(), "content");
+
 const getPost = (slug: string) => {
-  const postsDirectory = path.join(process.cwd(), "content");
   const filePath = path.join(postsDirectory, `${slug}.mdx`);
   const fileContents = fs.readFileSync(filePath, "utf8");
   const { data, content } = matter(fileContents);
-
   return { data, content };
 };
+
+export async function generateStaticParams() {
+  const filenames = fs.readdirSync(postsDirectory);
+
+  return filenames.map((filename) => ({
+    slug: filename.replace(/\.mdx$/, ""),
+  }));
+}
 
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: { slug: string };
 }) {
-  const slug = (await params).slug;
+  const { slug } = await params;
   const { data } = getPost(slug);
 
   return {
@@ -43,9 +51,9 @@ export async function generateMetadata({
 export default async function PostPage({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: { slug: string };
 }) {
-  const slug = (await params).slug;
+  const { slug } = await params;
   const { data, content } = getPost(slug);
 
   return (
