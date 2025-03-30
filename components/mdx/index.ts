@@ -36,4 +36,5 @@ export const markdownComponents = {
   TableRow,
   TableCell,
   Callout,
+  CustomLink,
 };

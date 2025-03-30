@@ -1,0 +1,101 @@
+---
+title: "Window.postMessage를 활용한 iframe 간 안전한 데이터 통신"
+subTitle: ""
+date: "2025-03-30"
+thumbnail: ""
+---
+
+[2024 회고](/blog/2024-retrospective) 글에서 잠깐 언급되었던 작년 2~4분기에 클라이언트사 개발 중 적용한 기술을 공유하고자 합니다.
+
+<br />
+
+기획 문서에서는 개발 중인 웹사이트(자식 웹)를 iframe을 통해 클라이언트사 웹사이트(부모 웹) 내부에 삽입하도록 했습니다. 그런데 부모 웹에서 관리하는 사용자 인증 토큰을 iframe 내부의 자식 웹에서 참조해야 했으나, 브라우저의 동일 출처 정책(CORS, Cross-Origin Resource Sharing)으로 인해 직접 접근이 불가능한 상황이었습니다.
+
+<br />
+
+이 글에서는 이런 상황에서 활용할 수 있는 웹 표준 API인 `window.postMessage()`를 통해 안전하게 크로스 오리진 데이터를 주고받는 방법과 그 과정에서의 주의점을 정리했습니다.
+
+# 문제 상황
+
+- 자식 웹은 iframe 형태로 부모 웹 내부에 삽입됩니다.
+- 자식 웹이 부모 웹의 세션 스토리지에 저장된 인증 토큰을 사용할 수 있어야 합니다.
+- iframe 내의 버튼 클릭과 같은 액션이 부모 웹의 페이지 전환이나 특정 작업 수행을 유발해야 합니다.
+
+<br />
+
+브라우저 보안 정책상 서로 다른 도메인 간에는 세션 스토리지와 같은 자원에 직접 접근이 제한됩니다. 따라서 안전하면서도 효율적인 데이터 통신 방식이 필요했습니다.
+
+# **해결책: window.postMessage()**
+
+<CustomLink
+  href="https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage"
+  target="_blank"
+  rel="noopener noreferrer"
+>
+  Window: postMessage() method
+</CustomLink>
+
+<br />
+
+이 문제를 해결하기 위해 `window.postMessage()`를 활용하는 방법을 제안드렸고, 논의 끝에 안전하게 데이터를 교환할 수 있는 `window.postMessage()`를 사용하는 방향으로 결정되었습니다.
+
+<br />
+
+`window.postMessage()`는 크로스 오리진 간에도 안전하게 메시지를 주고받을 수 있도록 지원하는 웹 표준 API입니다. 주로 iframe과 부모 페이지, 팝업 창과 부모 페이지 간의 데이터 교환에 활용됩니다.
+
+<br />
+
+![](/posts/secure-iframe-communication-with-postmessage/1.png)
+
+# 기본 동작 방법
+
+```js
+targetWindow.postMessage(message, targetOrigin, [transfer]);
+```
+
+- `targetWindow`: 메시지를 전달할 대상 window의 참조
+- `message`: 전송될 데이터 (객체, 문자열 등)
+- `targetOrigin`: 메시지를 받을 window의 origin(스키마, 도메인, 포트)입니다. **보안을 위해 반드시 명시적으로 지정해야 하며**, 특별한 경우가 아니라면 "\*"를 사용하지 않습니다.
+
+<br />
+
+아래는 메시지를 보내고 받는 예시 코드입니다:
+
+```js
+// 1. 메시지 전송 (자식 웹)
+window.parent.postMessage({ type: "REQUEST_TOKEN" }, "https://parent-web.com");
+
+// 2. 메시지 수신 및 응답 (부모 웹)
+window.addEventListener("message", (event) => {
+  if (event.origin !== "https://child-web.com") return;
+
+  if (event.data.type === "REQUEST_TOKEN") {
+    const token = sessionStorage.getItem("user_token");
+    event.source.postMessage({ type: "TOKEN_RESPONSE", token }, event.origin);
+  }
+});
+
+// 3. 메시지 수신 후 처리 (자식 웹)
+window.addEventListener("message", (event) => {
+  if (event.origin !== "https://parent-web.com") return;
+
+  if (event.data.type === "TOKEN_RESPONSE") {
+    const userToken = event.data.token;
+    // 인증 토큰 사용 로직 실행
+  }
+});
+```
+
+1. **자식 웹 → 부모 웹**: 자식 웹에서 부모 웹에 인증 토큰 요청 메시지를 전송합니다.
+2. **부모 웹 → 자식 웹**: 부모 웹은 요청받은 메시지를 확인하고 세션 스토리지에서 토큰을 가져와 다시 자식 웹으로 응답합니다.
+3. **자식 웹**: 부모 웹으로부터 받은 인증 토큰 메시지를 받아 실제 필요한 인증 처리 작업을 수행합니다.
+
+<br />
+
+<Callout icon="🚨">
+  postMessage 사용 시 보안 주의사항
+  - 메시지 수신 시 반드시 `event.origin`을 체크하여 신뢰할 수 있는 출처에서만
+  메시지를 처리하세요.
+  - 민감한 데이터 전송 시 `targetOrigin`은 반드시 명시적으로 설정하여
+  메시지가 잘못된 사이트로 전달되지 않도록 방지하세요.
+</Callout>
